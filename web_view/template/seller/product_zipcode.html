@@ -1,0 +1,75 @@
+{% load filters %}
+<div class="card-body">
+    <div class="d-lg-flex justify-content-between align-items-center pt-2 pb-3 border-bottom">
+        <div class="d-flex mb-4 text-dark w-100 text-center">
+            <h5 class="w-100">Available Zip Code</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="card w-100">
+            {% if request.permission %}
+                <div class="card-body pb-0">
+                    <form class="needs-validation mt-5" method="post">
+                        <div class="form-row">
+                            <div class="col-md-12 mb-3">
+                                <label for="validationCustom04">Area</label>
+                                <select data-placeholder="  Choose City" data-live-search="true" class="p-zipcode" name="pzipcode" style="width:100%">
+                                    {% for c in zip_codes.zips %}
+                                        <option value="{{ c.zipcodes_str }}">{{ c.city }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <input class="btn btn-primary" type="submit" value="Save Now"/>
+                    </form>
+                </div>
+            {% endif %}
+            <div class="card-body">
+                <div id="table" class="table-editable">
+                    <span class="table-add float-right mb-3 mr-2">
+                        {% for foo in zip_codes.sel %}
+                            <button type="button" class="btn btn-{{ "primary,success,danger,info,warning"|random_str }} p-1">{{ foo.city }}</button>
+                        {% endfor %}
+
+                    </span>
+                    <table class="table table-bordered table-responsive-md table-striped text-center">
+                        <thead>
+                        <tr>
+                            <th class="text-center"><b>City</b></th>
+                            <th class="text-center"><b>State</b></th>
+                            <th class="text-center"><b>ZipCode</b></th>
+                            {% if request.permission %}
+                                <th class="text-center"><b>Remove</b></th>
+                            {% endif %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for zip in shop_zipcode %}
+                            <tr>
+                                <td class="pt-3-half">{{ zip.zipcode.city }}</td>
+                                <td class="pt-3-half">{{ zip.zipcode.state }}</td>
+                                <td class="pt-3-half">{{ zip.zipcode.zipcode }}</td>
+                                {% if request.permission %}
+                                    <td>
+                                    <span class="table-remove">
+                                        <a href="?id={{ zip.id }}" class="btn btn-danger btn-rounded btn-sm my-0">Remove</a>
+                                    </span>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('.p-zipcode').select2();
+    });
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+</script>

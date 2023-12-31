@@ -1,0 +1,87 @@
+<div class="content-wrapper mt-0 bg-white">
+    <div class="d-xl-flex justify-content-between align-items-start">
+        <h2 class="text-dark font-weight-bold mb-2"> Fees</h2>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tab-content tab-transparent-content">
+                <div class="tab-pane fade active show" id="business-1" role="tabpanel" aria-labelledby="business-tab">
+                    <div class="row">
+                        <div class="card-deck" style="width: 100%">
+                            {% for fee in fees %}
+                                <div class="col-md-6">
+                                    <div class="card" style="background: aliceblue;">
+                                        <div class="card-body pb-0">
+                                            <h5 class="card-title">${{ fee.charge }} [{{ fee.amount_type }}]</h5>
+                                            <div>
+                                                <div class="form-group">
+                                                    <label>Fee</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text">$</span>
+                                                        </div>
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text">00.00</span>
+                                                        </div>
+                                                        <input type="text" id="charge_{{ fee.id }}" min="0" max="1000000" class="form-control" value="{{ fee.charge }}">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Amount Rang</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text">$</span>
+                                                        </div>
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text">0-0</span>
+                                                        </div>
+                                                        <input type="text" id="range_start_{{ fee.id }}" min="0" max="1000000" class="form-control" value="{{ fee.amount_min }}">
+                                                        <input type="text" id="range_end_{{ fee.id }}" min="0" max="1000000" class="form-control" value="{{ fee.amount_max }}">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="form-group">
+                                                        <label>Fee Type</label>
+                                                        <select data-placeholder="Fee Type" class="fee-dropdown-single" id="fee_type_{{ fee.id }}" style="width:100%">
+                                                            {% if fee.amount_type == 'FIX_AMOUNT' %}
+                                                                <option value="FIX_AMOUNT" selected>FIX AMOUNT</option>
+                                                                <option value="PERCENTAGE">PERCENTAGE</option>
+                                                            {% else %}
+                                                                <option value="FIX_AMOUNT">FIX AMOUNT</option>
+                                                                <option value="PERCENTAGE" selected>PERCENTAGE</option>
+                                                            {% endif %}
+                                                        </select>
+                                                    </div>
+                                                    <script>
+                                                        $(document).ready(function () {
+                                                            $('#fee_type_{{ fee.id }}').select2();
+                                                        });
+                                                    </script>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <input type="submit" class="btn btn-primary float-right" value="Save" onclick="saveFee({{ fee.id }})">
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <br>
+            <br>
+        </div>
+    </div>
+</div>
+<script>
+    function saveFee(id) {
+        const min = $("#range_start_" + id).val()
+        const max = $("#range_end_" + id).val()
+        const charge = $("#charge_" + id).val()
+        const fee_type = $("#fee_type_" + id).val()
+        window.location.href = "?id=" + id + "&min=" + min + "&max=" + max + "&charge=" + charge + "&fee_type=" + fee_type
+    }
+</script>

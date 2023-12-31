@@ -1,0 +1,81 @@
+{% load filters %}
+<div class="card-body">
+    <div class="d-lg-flex justify-content-between align-items-center pt-2 pb-3 border-bottom">
+        <div class="d-flex mb-4 text-dark w-100 text-center">
+            <h5 class="w-100">All Product ({{ products.paginator.count }})</h5>
+        </div>
+    </div>
+    {% ifequal products.paginator.count 0 %}
+        <div>
+            <center><h3 class="text-gray mt-lg-5">Nothing yet to show</h3></center>
+        </div>
+    {% endifequal %}
+    <div class="row product-item-wrapper mt-4">
+        {% for p in products %}
+            <div class="col-lg-4 col-md-6 col-sm-6 col-12 product-item">
+                <div class="card" style="box-shadow:0 3px 8px 0 rgba(0, 0, 0, 0.13) ">
+                    <div class="card-body">
+                        <div style="width: 142%;background: url('{{ p.image1 }}') no-repeat center /cover;height: 250px;">
+
+                        </div>
+                        <div class="action-holder">
+                            {% if p.created|new_product %}
+                                <div class="sale-badge bg-success">New</div>
+                            {% endif %}
+                            {% ifequal p.shop.id request.user.id %}
+                                <div class="sale-badge bg-warning ml-2"><a href="./add/{{ p.id }}" class="text-decoration-none text-black">Edit</a></div>
+                            {% else %}
+                                {% if request.user.is_superuser %}
+                                    <div class="sale-badge bg-warning ml-2"><a href="./add/{{ p.id }}" class="text-decoration-none text-black">Edit</a></div>
+                                {% endif %}
+                            {% endifequal %}
+                            <span class="favorite-button"><i class="mdi mdi-heart-outline"></i></span>
+                        </div>
+                        <img class="product_image my-bs" src="{{ p.image1 }}" alt="prduct image" style="height: 200px;overflow: hidden;display: none">
+                        <p class="product-title text-dark mt-3"><a href="./add/{{ p.id }}" class="text-black font-weight-bold-5 text-decoration-none">{{ p.name }}</a></p>
+                        <p class="product-price text-dark mt-3">${{ p.price_new }}</p>
+                        {% if p.discount == 0 %}
+                            <p class="product-actual-price text-black-50"></p>
+                        {% else %}
+                            <p class="product-actual-price text-black-50">${{ p.price }}</p>
+                        {% endif %}
+                        <ul class="product-variation">
+                            <li><a>{{ p.category.name }}</a></li>
+                            {% ifequal p.shop.is_superuser True %}
+                                <li style="background: #014f8e66"><a>Kayi</a></li>
+                            {% endifequal %}
+                        </ul>
+                        <p class="product-description" style="height: 45px; overflow: hidden;">{{ p.descriptions_html |textify_n_char:100 }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-12 mt-5">
+            <nav aria-label="Page navigation example">
+                {% if products.has_other_pages %}
+                    <ul class="pagination justify-content-center">
+                        {% if products.has_previous %}
+                            <li class="paginate_button page-item previous"><a href="?page={{ products.previous_page_number }}" aria-controls="order-listing" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li>
+                        {% else %}
+                            <li class="paginate_button page-item previous disabled"><a href="#" aria-controls="order-listing" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li>
+                        {% endif %}
+                        {% for i in products.number|page_range:products.paginator.num_pages %}
+                            {% if products.number == i %}
+                                <li class="paginate_button page-item active disabled"><a aria-controls="order-listing" data-dt-idx="{{ i }}" tabindex="0" class="page-link">{{ i }}</a></li>
+                            {% else %}
+                                <li class="paginate_button page-item "><a href="?page={{ i }}" aria-controls="order-listing" data-dt-idx="{{ i }}" tabindex="0" class="page-link">{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if products.has_next %}
+                            <li class="paginate_button page-item next" id="order-listing_next"><a href="?page={{ products.next_page_number }}" aria-controls="order-listing" data-dt-idx="3" tabindex="0" class="page-link">Next</a></li>
+                        {% else %}
+                            <li class="paginate_button page-item next disabled" id="order-listing_next"><a href="#" aria-controls="order-listing" data-dt-idx="3" tabindex="0" class="page-link">Next</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+</div>

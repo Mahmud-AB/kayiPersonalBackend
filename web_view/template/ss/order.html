@@ -1,0 +1,161 @@
+{% load filters %}
+<link rel="stylesheet" href="https://cdn.datatables.net/v/dt/dt-1.10.22/datatables.min.css">
+<div class="content-wrapper">
+    <div class="d-xl-flex justify-content-between align-items-start">
+        <h2 class="text-dark font-weight-bold mb-2"> Orders </h2>
+        <form method="post" class="d-sm-flex justify-content-xl-between align-items-center mb-2">
+            <div class="btn-group bg-white p-3 mr-2 mb-1" style="width: 160px" role="group" aria-label="Basic example">
+                <input type="number" name="id" style="width: 100%" value="{{ request.POST.id }}" class="btn text-dark py-0" placeholder="Order Number">
+            </div>
+
+            <div class="btn-group bg-white p-3 mr-2 mb-1" style="width: 160px" role="group" aria-label="Basic example">
+                <input type="number" name="user_number" style="width: 100%" value="{{ request.POST.id }}" class="btn text-dark py-0" placeholder="Phone">
+            </div>
+            <div class="btn-group bg-white p-3 mr-2 mb-1" style="width: 160px" role="group" aria-label="Basic example">
+                <select class="btn text-dark py-0" name="delivery_type">
+                    {% if request.POST.delivery_type == 'delivery' %}
+                        <option value="delivery,store_pickup">Delivery/PickUp</option>
+                        <option value="delivery" selected>Delivery</option>
+                        <option value="store_pickup">Store Pickup</option>
+                    {% elif request.POST.delivery_type == 'store_pickup' %}
+                        <option value="delivery,store_pickup">Delivery/PickUp</option>
+                        <option value="delivery">Delivery</option>
+                        <option value="store_pickup" selected>Store Pickup</option>
+                    {% else %}
+                        <option value="delivery,store_pickup">Delivery/PickUp</option>
+                        <option value="delivery">Delivery</option>
+                        <option value="store_pickup">Store Pickup</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <div class="btn-group bg-white p-3 mr-2 mb-1" style="width: 160px" role="group" aria-label="Basic example">
+                <button type="submit" class="btn text-dark py-0"><i class="mdi mdi-cart me-1"></i>&nbsp;Search</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="row" id="content">
+        <div class="col-lg-12">
+            <div class="card px-2 pt-5">
+                <div class="table-responsive">
+                    <div id="order-listing_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table class="table">
+                                    <thead>
+                                    <tr class="bg-dark text-white">
+                                        <th class="sorting" tabindex="0" aria-controls="order-listing" rowspan="1" colspan="1" aria-label="Order #: activate to sort column ascending" style="width: 116px;"><b>Order #</b></th>
+                                        <th class="sorting" tabindex="0" aria-controls="order-listing" rowspan="1" colspan="1" aria-label="Base Price: activate to sort column ascending" style="width: 147px;"><b>Order</b></th>
+                                        <th class="sorting" tabindex="0" aria-controls="order-listing" rowspan="1" colspan="1" aria-label="Base Price: activate to sort column ascending" style="width: 147px;"><b>Tax</b></th>
+                                        <th class="sorting" tabindex="0" aria-controls="order-listing" rowspan="1" colspan="1" aria-label="Base Price: activate to sort column ascending" style="width: 147px;"><b>Delivery</b></th>
+                                        <th class="sorting" tabindex="0" aria-controls="order-listing" rowspan="1" colspan="1" aria-label="Base Price: activate to sort column ascending" style="width: 147px;"><b>Total</b></th>
+                                        <th class="sorting" tabindex="0" aria-controls="order-listing" rowspan="1" colspan="1" aria-label="Base Price: activate to sort column ascending" style="width: 147px;"><b>Phone Number</b></th>
+                                        <th class="sorting_asc" tabindex="0" aria-controls="order-listing" rowspan="1" colspan="1" aria-label="Purchased Price: activate to sort column descending" style="width: 210px;" aria-sort="ascending"><b>Order Date</b></th>
+                                        <th class="sorting" tabindex="0" aria-controls="order-listing" rowspan="1" colspan="1" aria-label="Status: activate to sort column ascending" style="width: 122px;"><b>Status</b></th>
+                                        <th class="sorting" tabindex="0" aria-controls="order-listing" rowspan="1" colspan="1" aria-label="Actions: activate to sort column ascending" style="width: 298px;"><b>Actions</b></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% define False as order_list_len %}
+                                    {% for order in order_list %}
+                                        {% define True as order_list_len %}
+                                        <tr role="row" class="odd">
+                                            <td class="">OD-{{ order.id }}</td>
+                                            <td>${{ order.amount }}</td>
+                                            <td>${{ order.tax_amount }}</td>
+                                            <td>
+                                                {% if order.delivery_method == 'delivery' %}
+                                                    Delivery<strong>(${{ order.delivery_amount }})</strong>
+                                                {% else %}
+                                                    Store PickUp <strong>({{ order.picup_datetime|date:"d M y h:mA" }})</strong>
+                                                {% endif %}
+                                            </td>
+                                            <td>${{ order.total_amount }}</td>
+                                            <td>
+                                                {{ order.get_phone_number }}
+                                            </td>
+                                            <td class="sorting_1">{{ order.created|date:"d M y h:mA" }}</td>
+                                            <td>
+                                                {% if "ORDERED" in order.status %}
+                                                    <label class="badge badge-danger">Pending</label>
+                                                {% elif "PAYMENT_PENDING" in order.status %}
+                                                    <label class="badge badge-gradient-light" style="background: linear-gradient(to bottom, #0062ff, #aab2bd) !important;">Payment Pending</label>
+                                                {% elif "PROCESSING" in order.status %}
+                                                    <label class="badge badge-dark">Acknowledged</label>
+                                                {% elif "PENDING" in order.status %}
+                                                    <label class="badge badge-warning">Pending</label>
+                                                {% elif "COMPLETE" in order.status %}
+                                                    <label class="badge badge-gradient-success">Delivered</label>
+                                                {% elif "SHIPPING" in order.status %}
+                                                    <label class="badge badge-info">Ready to Ship</label>
+                                                {% elif "TRANSIT" in order.status %}
+                                                    <label class="badge badge-primary">Transit</label>
+                                                {% elif "CANCEL" in order.status %}
+                                                    <label class="badge badge-inverse-danger">Canceled</label>
+                                                {% endif %}
+
+                                            </td>
+                                            <td class="text-right">
+                                                <a class="btn btn-success p-2" href="order/{{ order.id }}"><i class="mdi mdi-eye text-white"></i> View</a>
+                                                {% if "ORDERED" == order.status %}
+                                                    <a class="btn btn-light p-2" href="order/invoice/inv-{{ order.id }}" target="_blank"><i class="mdi mdi-paypal text-gray"></i> Invoice</a>
+                                                    <button class="btn btn-danger p-2" onclick="cancelHoleOrder({{ order.id }})"><i class="mdi mdi-format-clear text-white"></i> Cancel</button>
+                                                {% elif "PAYMENT_PENDING" == order.status %}
+                                                    <button class="btn btn-danger p-2" onclick="cancelHoleOrder({{ order.id }})"><i class="mdi mdi-format-clear text-white"></i> Cancel</button>
+                                                {% elif "PROCESSING" == order.status %}
+                                                    <a class="btn btn-light p-2" href="order/invoice/inv-{{ order.id }}" target="_blank"><i class="mdi mdi-paypal text-gray"></i> Invoice</a>
+                                                    <button class="btn btn-danger p-2" onclick="cancelHoleOrder({{ order.id }})"><i class="mdi mdi-format-clear text-white"></i> Cancel</button>
+                                                {% elif "COMPLETE" == order.status %}
+                                                    <a class="btn btn-light p-2" href="order/invoice/inv-{{ order.id }}" target="_blank"><i class="mdi mdi-paypal text-gray"></i> Invoice</a>
+                                                {% elif "SHIPPING" == order.status %}
+                                                    <a class="btn btn-light p-2" href="order/invoice/inv-{{ order.id }}" target="_blank"><i class="mdi mdi-paypal text-gray"></i> Invoice</a>
+                                                    <button class="btn btn-danger p-2" onclick="cancelHoleOrder({{ order.id }})"><i class="mdi mdi-format-clear text-white"></i> Cancel</button>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 mt-5">
+                        <nav aria-label="Page navigation example">
+                            {% if order_list.has_other_pages %}
+                                <ul class="pagination justify-content-center">
+                                    {% if order_list.has_previous %}
+                                        <li class="paginate_button page-item previous"><a href="?page={{ order_list.previous_page_number }}" aria-controls="order-listing" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li>
+                                    {% else %}
+                                        <li class="paginate_button page-item previous disabled"><a href="#" aria-controls="order-listing" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li>
+                                    {% endif %}
+                                    {% for i in order_list.number|page_range:order_list.paginator.num_pages %}
+                                        {% if order_list.number == i %}
+                                            <li class="paginate_button page-item active disabled"><a aria-controls="order-listing" data-dt-idx="{{ i }}" tabindex="0" class="page-link">{{ i }}</a></li>
+                                        {% else %}
+                                            <li class="paginate_button page-item "><a href="?page={{ i }}" aria-controls="order-listing" data-dt-idx="{{ i }}" tabindex="0" class="page-link">{{ i }}</a></li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if order_list.has_next %}
+                                        <li class="paginate_button page-item next" id="order-listing_next"><a href="?page={{ order_list.next_page_number }}" aria-controls="order-listing" data-dt-idx="3" tabindex="0" class="page-link">Next</a></li>
+                                    {% else %}
+                                        <li class="paginate_button page-item next disabled" id="order-listing_next"><a href="#" aria-controls="order-listing" data-dt-idx="3" tabindex="0" class="page-link">Next</a></li>
+                                    {% endif %}
+                                </ul>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/public/js/pages/order.js"></script>
+<script>
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+</script>

@@ -1,0 +1,74 @@
+{% load filters %}
+<div class="card-body">
+    <div class="d-lg-flex justify-content-between align-items-center pt-2 pb-3 border-bottom">
+        <div class="d-flex mb-4 text-dark w-100 text-center">
+            <h5 class="w-100">Available Zip Code</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="card w-100">
+            <div class="card-body pb-0">
+                <form class="needs-validation mt-5" method="post">
+                    <div class="form-row">
+                        <div class="col-md-9 mb-3">
+                            <label for="validationCustom04">Area</label>
+                            <select data-placeholder="  Choose City" data-live-search="true" class="p-zipcode" name="pzipcode" style="width:100%">
+                                {% for c in city_codes %}
+                                    <option value="{{ c.zipcodes_str }}">{{ c.city }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="validationCustom04">Tax</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">00.00</span>
+                                </div>
+                                <input id="p_price" type="text" min="0" max="100" class="form-control" name="ptax" aria-label="Tax">
+                            </div>
+                        </div>
+                    </div>
+                    <input class="btn btn-primary" type="submit" value="Save Now"/>
+                </form>
+            </div>
+            <div class="card-body">
+                <div id="table" class="table-editable">
+                    <span class="table-add float-right mb-3 mr-2">
+                        {% for foo in city_codes %}
+                            <button type="button" class="btn btn-{{ "primary,success,danger,info,warning"|random_str }} p-1">{{ foo.city }}</button>
+                        {% endfor %}
+
+                    </span>
+                    <table class="table table-bordered table-responsive-md table-striped text-center">
+                        <thead>
+                        <tr>
+                            <th class="text-center">City</th>
+                            <th class="text-center">State</th>
+                            <th class="text-center">ZipCode</th>
+                            <th class="text-center">Tax</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for zip in all_zipcode %}
+                            <tr>
+                                <td class="pt-3-half">{{ zip.city }}</td>
+                                <td class="pt-3-half">{{ zip.state }}</td>
+                                <td class="pt-3-half">{{ zip.zipcode }}</td>
+                                <td class="pt-3-half">{{ zip.tax }}%</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('.p-zipcode').select2();
+    });
+</script>

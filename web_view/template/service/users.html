@@ -1,0 +1,71 @@
+<div class="content-wrapper mt-0 bg-white">
+    <div class="d-xl-flex justify-content-between align-items-start">
+        <h2 class="text-dark font-weight-bold mb-2"> Users | {{ users.paginator.count }} </h2>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tab-content tab-transparent-content">
+                <div class="tab-pane fade active show" id="business-1" role="tabpanel" aria-labelledby="business-tab">
+                    <div class="row">
+                        {% for user in users %}
+                            <div class="col-xl-3 col-lg-6 col-sm-6 grid-margin stretch-card">
+                                <div class="card">
+                                    <div class="card-body text-center bg-light-grey">
+                                        <h5 class="mb-2 text-dark font-weight-bold">{{ user.get_full_name }}</h5>
+                                        <h5 class="mb-4 text-dark font-weight-normal"><a class="text-decoration-none" href="mailto:{{ user.email }}">{{ user.email }}</a></h5>
+                                        <div class="dashboard-progress">
+                                            <div class="thumb">
+                                                {% ifequal user.image None %}
+                                                    <img class="img-fluid" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTmp7Zkhf_H_iJDUGaaRhchdSo0Qt6xUqQJ2HxC9kmAvpvmhxG6&usqp=CAU" alt="">
+                                                {% else %}
+                                                    <img class="img-fluid" src="{{ user.image }}" alt="">
+                                                {% endifequal %}
+                                            </div>
+                                        </div>
+                                        <p class="mt-4 mb-0">{{ user.phone }}</p>
+                                        <p class="mt-2 mb-0">{{ user.get_address }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-3 mt-sm-3">
+        {% if users.has_other_pages %}
+            <ul class="pagination justify-content-center mb-0">
+                {% if users.has_previous %}
+                    <li class="paginate_button page-item previous"><a href="?page={{ users.previous_page_number }}" aria-controls="order-listing" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li>
+                {% else %}
+                    <li class="paginate_button page-item previous disabled"><a href="#" aria-controls="order-listing" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li>
+                {% endif %}
+                {% for i in users.paginator.page_range %}
+                    {% if users.number == i %}
+                        <li class="paginate_button page-item active disabled"><a aria-controls="order-listing" data-dt-idx="{{ i }}" tabindex="0" class="page-link">{{ i }}</a></li>
+                    {% else %}
+                        <li class="paginate_button page-item "><a href="?page={{ i }}" aria-controls="order-listing" data-dt-idx="{{ i }}" tabindex="0" class="page-link">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if users.has_next %}
+                    <li class="paginate_button page-item next" id="order-listing_next"><a href="?page={{ users.next_page_number }}" aria-controls="order-listing" data-dt-idx="3" tabindex="0" class="page-link">Next</a></li>
+                {% else %}
+                    <li class="paginate_button page-item next disabled" id="order-listing_next"><a href="#" aria-controls="order-listing" data-dt-idx="3" tabindex="0" class="page-link">Next</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+</div>
+<style>
+    .thumb {
+        margin-right: 20px;
+    }
+
+    .thumb img {
+        width: 100px;
+        height: 100px;
+        -o-object-fit: cover;
+        object-fit: cover;
+        overflow: hidden;
+</style>

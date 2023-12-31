@@ -1,0 +1,329 @@
+{% load filters %}
+<style>
+    hr {
+        background-color: rgba(248, 248, 248, 0.667)
+    }
+
+    .change-color {
+        color: #014f8e !important
+    }
+
+    .card-2 {
+        box-shadow: 1px 1px 3px 0px rgb(112, 115, 139)
+    }
+
+    .fa-circle.active {
+        font-size: 8px;
+        color: #014f8e
+    }
+
+    .fa-circle {
+        font-size: 8px;
+        color: #aaa
+    }
+
+    .rounded {
+        border-radius: 2.25rem !important
+    }
+
+    .progress-bar {
+        background-color: #014f8e !important
+    }
+
+    .progress {
+        height: 5px !important;
+        margin-bottom: 0
+    }
+
+    .invoice {
+        position: relative;
+        top: -70px
+    }
+
+    .card-footer {
+        background-color: #014f8e;
+        color: #fff
+    }
+
+    h2 {
+        color: rgb(226, 226, 226);
+        letter-spacing: 2px !important
+    }
+
+    .display-3 {
+        font-weight: 500 !important
+    }
+
+    @media (max-width: 479px) {
+        .invoice {
+            position: relative;
+            top: 7px
+        }
+
+        .border-line {
+            border-right: 0px solid rgb(226, 206, 226) !important
+        }
+    }
+
+    @media (max-width: 700px) {
+        h2 {
+            color: #236294;
+            font-size: 17px
+        }
+
+        .display-3 {
+            font-size: 28px;
+            font-weight: 500 !important
+        }
+    }
+
+    .card-footer small {
+        letter-spacing: 7px !important;
+        font-size: 12px
+    }
+</style>
+<div class="card-body pl-lg-5 pr-lg-5">
+    <div class="card">
+        <div class="container-fluid d-flex justify-content-between mt-5">
+            <div class="col-lg-3 pl-0">
+                <h3 class="text-left">Order&nbsp;&nbsp;#{{ order.id }}</h3>
+            </div>
+        </div>
+        <hr>
+        <div class="container-fluid d-flex justify-content-between">
+            <div class="col-auto">
+                <div class="col">
+                    <p class="mb-1"> Invoice Number : {{ order.id }}-{{ request.user.id }}</p>
+                    <p class="mb-1">Invoice Date : {{ order.created|date:"d M y h:mA" }}</p>
+                    {% if order.delivery_method == 'store_pickup' %}
+                        {% if order.picup_location != None %}
+                            <p class="mb-1"><strong>Pickup Address : {{ order.picup_location }}</strong></p>
+                        {% endif %}
+                        {% if order.picup_datetime != None %}
+                            <p class="mb-1">
+                                <strong>Pickup Time : {{ order.picup_datetime|date:"d M y h:mA" }}</strong>
+                                <i onclick="simplepicker.open();" class="mdi mdi-refresh menu-icon change-color"></i>
+                            </p>
+                            <div class="" style="display: none">
+                                <input type="text" class="form-control" readonly id="setPickUpTime" value="Click Here For Set Pickup Time"/>
+                                <div class="invalid-feedback">
+                                    Please provide a valid datetime.
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="">
+                                <input type="text" class="form-control" readonly id="setPickUpTime" onclick="simplepicker.open();" value="Click Here For Set Pickup Time">
+                                <div class="invalid-feedback">
+                                    Please provide a valid datetime.
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-auto ">
+                <p class="">
+                    <img src="{{ order.user.image }}" height="22" alt=""/>
+                    <b style="font-size: 18px"> {{ order.user.get_full_name }}</b>
+                <hr>
+                {% if order.delivery_method == 'delivery' %}
+                    {{ address.address }}
+                    <br>
+                    {{ address.city }}, {{ address.state }} {{ address.zip }}
+                    <br>
+                {% endif %}
+                {{ order.get_phone_number }}
+                </p>
+            </div>
+        </div>
+        <br>
+        <br>
+        <br>
+        <div class="container-fluid justify-content-center w-100 p-0">
+            <div class="table-responsive w-100">
+                <table class="table" style="border: 1px solid #dddddd;">
+                    <thead>
+                    <tr class="bg-dark text-white">
+                        <th class="text-center">Action</th>
+                        <th class="text-center">Status</th>
+                        <th>Title</th>
+                        <th class="text-right">Quantity</th>
+                        <th class="text-right">Unit cost</th>
+                        <th class="text-right">Discount</th>
+                        <th class="text-right">Total</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for pp in invoice %}
+                        {% if pp.status == "CANCEL" %}
+                            <tr class="text-right" style="text-decoration: line-through;">
+                                <td class="text-center">N/A</td>
+                                <td class="text-center">{{ pp.status }}</td>
+                                <td class="text-left"><a style="font-size: 12px" class="text-black" href="../product/add/{{ pp.product.id }}">{{ pp.product.name }}</a></td>
+                                <td>{{ pp.product_quantity }}</td>
+                                <td>${{ pp.product_price }}</td>
+                                <td>{{ pp.product_discount }}%</td>
+                                <td>${{ pp.product_price_final }}</td>
+                            </tr>
+                        {% else %}
+                            <tr class="text-right">
+                                <td class="text-center">
+                                    {% if pp.status == "ORDERED" %}
+
+                                        <button class="btn btn-danger p-2" onclick="cancelHoleOrderIndivisual({{ order.id }},{{ v.id }})">
+                                            <i class="mdi mdi-format-clear text-white"></i> Remove
+                                        </button>
+                                    {% elif v.status == "PROCESSING" %}
+                                        <button class="btn btn-danger p-2" onclick="cancelHoleOrderIndivisual({{ order.id }},{{ v.id }})">
+                                            <i class="mdi mdi-format-clear text-white"></i> Remove
+                                        </button>
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ pp.status }}</td>
+                                <td class="text-left"><a style="font-size: 12px" class="text-black" href="../product/add/{{ pp.product.id }}">{{ pp.product.name }}</a></td>
+                                <td>{{ pp.product_quantity }}</td>
+                                <td>${{ pp.product_price }}</td>
+                                <td>{{ pp.product_discount }}%</td>
+                                <td>${{ pp.product_price_final }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col">
+                <div class="row justify-content-between">
+                    <div class="col-auto">
+                        <p class="mb-1 text-dark"><b>Order Details</b></p>
+                    </div>
+                    <div class="flex-sm-col text-right col">
+                        <p class="mb-1"><b>Total</b></p>
+                    </div>
+                    <div class="flex-sm-col col-auto mr-3">
+                        <p class="mb-1">${{ order.amount }}</p>
+                    </div>
+                </div>
+                <div class="row justify-content-between">
+                    <div class="flex-sm-col text-right col">
+                        <p class="mb-1"><b>Tax Amount</b></p>
+                    </div>
+                    <div class="flex-sm-col col-auto mr-3">
+                        <p class="mb-1">${{ order.tax_amount }}</p>
+                    </div>
+                </div>
+                <div class="row justify-content-between">
+                    <div class="flex-sm-col text-right col">
+                        <p class="mb-1"><b>Delivery Charges</b></p>
+                    </div>
+                    <div class="flex-sm-col col-auto mr-3">
+                        <p class="mb-1">${{ order.delivery_amount }}</p>
+                    </div>
+                </div>
+                <div class="row justify-content-between">
+                    <div class="flex-sm-col text-right col">
+                        <p class="mb-1"><b>Delivery Tips</b></p>
+                    </div>
+                    <div class="flex-sm-col col-auto mr-3">
+                        <p class="mb-1">${{ order.tips }}</p>
+                    </div>
+                </div>
+                {% if order.voucher != None %}
+                    <div class="row justify-content-between">
+                        <div class="flex-sm-col text-right col">
+                            <p class="mb-1"><b></b></p>
+                        </div>
+                        <div class="flex-sm-col col-auto">
+                            <p class="mb-1">-------------------------------------</p>
+                        </div>
+                    </div>
+                    <div class="row justify-content-between">
+                        <div class="flex-sm-col text-right col">
+                            <p class="mb-1"><b>Voucher</b></p>
+                        </div>
+                        <div class="flex-sm-col col-auto">
+                            <p class="mb-1">-{{ order.get_voucher_amount }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="jumbotron-fluid">
+                <div class="row justify-content-between ">
+                    <div class="col-sm-auto col-auto my-auto"><img class="img-fluid my-auto align-self-center " src="/public/img/logo.png" width="115" height="115"></div>
+                    <div class="col-auto my-auto ">
+                        <h2 class="mb-0 font-weight-bold">TOTAL PAID FOR YOUR ORDER</h2>
+                    </div>
+                    <div class="col-auto my-auto ml-auto">
+                        <h1 class="display-3 ">$ {{ order.get_new_amount }}</h1>
+                    </div>
+                </div>
+                <div class="row mb-3 mt-3 mt-md-0">
+                    <div class="col-auto border-line"><small class="text-white">------------</small></div>
+                    <div class="col-auto border-line"><small class="text-white">------------</small></div>
+                    <div class="col-auto "><small class="text-white">------------ </small></div>
+                    <div class="col-auto my-auto ml-auto">
+                        {% if order.status == "ORDERED" %}
+                            <button class="btn btn-danger p-2" onclick="cancelHoleOrder({{ order.id }})">
+                                <i class="mdi mdi-format-clear text-white"></i>Order Cancel
+                            </button>
+                            <button class="btn btn-info p-2" onclick="processingHoleOrder({{ order.id }})">
+                                <i class="mdi mdi-progress-upload text-white"></i> Acknowledged
+                            </button>
+                            <button class="btn btn-primary p-2" onclick="shippingHoleOrder({{ order.id }})">
+                                <i class="mdi mdi-truck-delivery text-white"></i> Ready to Ship
+                            </button>
+                            <button class="btn badge-success p-2" onclick="transitHoleOrder({{ order.id }})">
+                                <i class="mdi mdi-truck-delivery text-white"></i> Transit
+                            </button>
+                        {% elif order.status == "PROCESSING" %}
+                            <button class="btn btn-danger p-2" onclick="cancelHoleOrder({{ order.id }})">
+                                <i class="mdi mdi-close text-white"></i>Order Cancel
+                            </button>
+                            <button class="btn btn-primary p-2" onclick="shippingHoleOrder({{ order.id }})">
+                                <i class="mdi mdi-truck-delivery text-white"></i> Ready to Ship
+                            </button>
+                            <button class="btn badge-success p-2" onclick="transitHoleOrder({{ order.id }})">
+                                <i class="mdi mdi-truck-delivery text-white"></i> Transit
+                            </button>
+                        {% elif order.status == "SHIPPING" %}
+                            <button class="btn btn-danger p-2" onclick="cancelHoleOrder({{ order.id }})">
+                                <i class="mdi mdi-close text-white"></i>Order Cancel
+                            </button>
+                            <button class="btn badge-success p-2" onclick="transitHoleOrder({{ order.id }})">
+                                <i class="mdi mdi-truck-delivery text-white"></i> Transit
+                            </button>
+                        {% elif order.status == "TRANSIT" %}
+                            <button class="btn btn-danger p-2" onclick="cancelHoleOrder({{ order.id }})">
+                                <i class="mdi mdi-close text-white"></i>Order Cancel
+                            </button>
+                            {% if request.user.is_superuser %}
+                                <button class="btn btn-success p-2" onclick="completeOrder({{ order.id }})">
+                                    <i class="mdi mdi-check-all text-white"></i> Delivered
+                                </button>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/public/js/pages/order.js"></script>
+<link rel="stylesheet" href="https://www.cssscript.com/demo/material-date-time-picker-simplepicker/dist/simplepicker.css">
+<script src="https://www.cssscript.com/demo/material-date-time-picker-simplepicker/dist/simplepicker.js"></script>
+<script src="https://momentjs.com/downloads/moment.js"></script>
+<script>
+    const simplepicker = new SimplePicker({
+        zIndex: 50
+    });
+    simplepicker.on('submit', (date, readableDate) => {
+        const formattedDate = moment(date).format('YYYY-MM-DD HH:mm:ss');
+        $("#setPickUpTime").val(formattedDate)
+        window.location.href = "?pickupTime=" + formattedDate;
+    });
+</script>

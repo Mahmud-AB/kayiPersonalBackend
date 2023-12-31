@@ -1,0 +1,131 @@
+{% load filters %}
+<div class="card-body">
+    <div class="d-lg-flex justify-content-between align-items-center pt-2 pb-3 border-bottom">
+        <div class="d-flex mb-4 text-dark w-100 text-center">
+            <h5 class="w-100">All Weight Type</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 grid-margin grid-margin-lg-0 stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title" id="add-update-category">Add New Weight</h4>
+                    <div class="forms-sample">
+                        <div class="form-group">
+                            <label>Select</label><br>
+                            <select class="js-example-basic-single w-100" id="categoryParent">
+                                <option value="">Chose Here</option>
+                                {% for c in all_weight %}
+                                    <option value="{{ c.id }}">{{ c.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryName">Weight Name</label>
+                            <input type="text" class="form-control" id="categoryName" placeholder="Name">
+                        </div>
+                        <div class="form-check">
+                            <button type="submit" id="save-category-now" class="btn btn-primary mr-2" style="display: inline-block">Save</button>
+                            <button type="submit" id="update-category-now" class="btn btn-primary mr-2" style="display: none">Update</button>
+                            <button type="submit" id="cancel-category-now" class="btn btn-danger mr-2" style="display: none">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 grid-margin grid-margin-lg-0 stretch-card">
+            <div class="card">
+                <div class="card-body recent-activity">
+                    {% for cate in all_weight %}
+                        <div class="d-flex mb-3">
+                            <div>
+                                <div class="activity-info hide-border" style="background: #0D0F12">
+                                </div>
+                            </div>
+                            <div class="activity-details">
+                                <h4 class="text-dark font-weight-normal">{{ cate.name }}</h4>
+                                <div class="mb-2">
+                                    <div class="badge badge-inverse-info mb-auto ml-auto cursor-pointer edit-category-option" val='{{ cate|convert_to_json }}'>Edit</div>
+                                    <div class="badge badge-inverse-danger mb-auto ml-auto cursor-pointer delete-category-option" val="{{ cate.id }}">Delete</div>
+                                </div>
+                                <div>
+                                    {% for cc in cate.child %}
+                                        <div class="d-flex mb-3">
+                                            <div>
+                                                <div class="activity-info" style="background: #f2a859">
+                                                </div>
+                                            </div>
+                                            <div class="activity-details">
+                                                <h4 class="text-dark font-weight-normal">{{ cc.name }}</h4>
+                                                <div>
+                                                    <div class="badge badge-inverse-info mb-auto ml-auto cursor-pointer edit-category-option" val='{{ cc|convert_to_json }}'>Edit</div>
+                                                    <div class="badge badge-inverse-danger mb-auto ml-auto cursor-pointer delete-category-option" val="{{ cc.id }}">Delete</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    let global_selected_id = null;
+    $(document).ready(function () {
+        $('.js-example-basic-single').select2();
+
+        $('#save-category-now').click(function () {
+            global_selected_id = '';
+            window.location.href = window.location.pathname + "?_method=POST&value=" + $('#categoryName').val() + ($('#categoryParent').val().length > 0 ? "&parent=" + $('#categoryParent').val() : "")
+        });
+
+        $('#update-category-now').click(function () {
+            window.location.href = window.location.pathname
+                + "?_method=PATCH"
+                + "&id=" + global_selected_id.id
+                + "&value=" + $('#categoryName').val()
+                + ($('#categoryParent').val().length > 0 ? "&parent=" + $('#categoryParent').val() : "")
+        });
+
+        $('.delete-category-option').click(function () {
+            swal({
+                title: 'Alert!',
+                text: "Do you want to perform this action",
+                type: 'error',
+                confirmButtonText: 'Delete'
+            }).then((okayClick) => {
+                if (okayClick === true || okayClick.value == true) {
+                    global_selected_id = null;
+                    window.location.href = window.location.pathname + "?_method=DELETE&id=" + $(this).attr('val')
+                }
+            });
+        });
+
+        $('.edit-category-option').click(function () {
+            global_selected_id = JSON.parse($(this).attr('val'));
+            if (global_selected_id.parent != null) {
+                $('#categoryParent').val(global_selected_id.parent).trigger('change');
+            } else {
+                $('#categoryParent').val('').trigger('change');
+            }
+            $('#categoryName').val(global_selected_id.name)
+
+            $('#save-category-now').css('display', 'none')
+            $('#update-category-now').css('display', 'inline-block')
+            $('#cancel-category-now').css('display', 'inline-block')
+        });
+
+        $('#cancel-category-now').click(function () {
+            global_selected_id = null
+            $('#categoryParent').val('').trigger('change');
+            $('#categoryName').val("")
+            $('#save-category-now').css('display', 'block')
+            $('#update-category-now').css('display', 'none')
+            $('#cancel-category-now').css('display', 'none')
+        })
+    });
+</script>

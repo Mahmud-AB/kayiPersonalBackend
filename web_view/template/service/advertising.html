@@ -1,0 +1,169 @@
+<div class="modal" id="browse-category-image-popup" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="max-width: 700px; min-width: 700px">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <div id="image_crop_view" class="w-100" style="margin-top:30px"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="crop-save">Crop & Save</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-body">
+    <div class="d-lg-flex justify-content-between align-items-center pt-2 pb-3 border-bottom">
+        <div class="d-flex mb-4 text-dark w-100 text-center">
+            <h5 class="w-100">Advertising</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 grid-margin grid-margin-lg-0 stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            Browse image 600X450 PX
+                            <label class="w-100 text-center" style="border: 2px dashed rgba(151, 151, 151, 0.3);">
+                                <img for="advertising-image" id="advertising-image-show" width="180" height="135" src="/public/img/browse-file.gif"/>
+                                <input type="file" class="d-none" id="advertising-image">
+                                </form>
+                            </label>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <div class="col-lg-6 form-group">
+                                    <label>Ad Type</label><br>
+                                    <select class="form-control w-100" id="advertising-type">
+                                        <option value="product">Product</option>
+                                        <option value="category">Category</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-6 form-group">
+                                    <label for="advertising-type-id">Search Item</label>
+                                    <select class="advertising-type-id-single w-100" id="advertising-type-id">
+                                        <option value="">Find item</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-12 form-group">
+                                    <div class="form-check">
+                                        <button type="submit" id="save-advertising-now" class="btn btn-primary mr-2 w-100">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row product-item-wrapper">
+            {% for p in pa_list %}
+                <div class="col-lg-3 col-md-6 col-sm-6 col-12 product-item">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="action-holder">
+                                <div class="sale-badge bg-danger cursor-pointer" onclick="deleteAdvertising({{ p.id }})"><i class="mdi mdi-delete text-medium"></i></div>
+                            </div>
+                            <img class="product_image my-bs" src="{{ p.image }}" alt="prduct image">
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function () {
+        const image_crop = $('#image_crop_view').croppie({enableExif: true, viewport: {width: 600, height: 450, type: 'square'}, boundary: {width: 600, height: 450}});
+        $('#advertising-image').on('change', function () {
+            /*$('#browse-category-image-popup').modal('show');
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                image_crop.croppie('bind', {
+                    url: event.target.result
+                }).then(function () {
+                    console.log('jQuery bind complete');
+                });
+            }
+            reader.readAsDataURL(this.files[0]);*/
+            const reader = new FileReader();
+            reader.onloadend = function () {
+                $('#advertising-image-show').attr('src', reader.result);
+            };
+            reader.readAsDataURL(this.files[0]);
+        });
+        $('#crop-save').click(function () {
+            image_crop.croppie('result', {type: 'canvas', size: 'viewport'}).then(function (response) {
+                $('#advertising-image-show').attr('src', response);
+            })
+            $('#browse-category-image-popup').modal('hide');
+        });
+
+        $('#save-advertising-now').click(function () {
+            showInfoToast("Please wait! Processing...")
+            $.post('/api/product/product-advertising-save', {
+                a_type: $('#advertising-type').val(),
+                a_type_id: $('#advertising-type-id').val(),
+                a_image: $('#advertising-image-show').attr('src'),
+            }, function (data, status) {
+                if (status == 'success') {
+                    if (data.status) {
+                        window.location.reload()
+                        showSuccessToast("Success")
+                    } else {
+                        showDangerToast(data.message)
+                    }
+                } else {
+                    showDangerToast("Something went wrong")
+                }
+            });
+        });
+
+        $("#advertising-type-id").select2({
+            minimumInputLength: 2,
+            tags: [],
+            allowClear: true,
+            ajax: {
+                url: function () {
+                    return ($('#advertising-type').val() == "category" ? "/api/product/categories" : "/api/product/search/without-zipcode");
+                },
+                dataType: 'json',
+                type: "GET",
+                processResults: function (data) {
+                    const data12 = ($('#advertising-type').val() == "category" ? data.data : data.data.results);
+                    console.log(data12);
+                    return {
+                        results: $.map(data12, function (item) {
+                            return {
+                                text: item.name+" ["+item.id+"]",
+                                id: item.id
+                            }
+                        })
+                    };
+                }
+            }
+        });
+    });
+
+    function deleteAdvertising(advertisingId) {
+        showInfoToast("Please wait! Processing...")
+        $.post('/api/product/product-advertising-delete', {id: advertisingId}, function (data, status) {
+            if (status == 'success') {
+                if (data.status) {
+                    window.location.reload()
+                    showSuccessToast("Success")
+                } else {
+                    showDangerToast(data.message)
+                }
+            } else {
+                showDangerToast("Something went wrong")
+            }
+        });
+    }
+</script>

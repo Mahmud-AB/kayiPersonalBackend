@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>TheKayi</title>
+    <link rel="icon" href="/public/img/logo.png" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Nunito"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css">
+    <link rel="stylesheet" href="https://jeremyfagis.github.io/dropify/dist/css/dropify.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/smartwizard@5.0.0/dist/css/smart_wizard_all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/3.7.95/css/materialdesignicons.min.css">
+
+    <link rel="stylesheet" href="/public/css/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="container-scroller">
+    <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+        <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+            <a class="navbar-brand brand-logo" href="/"><img src="/public/img/logo.png"
+                                                             alt="logo"/></a>
+            <a class="navbar-brand brand-logo-mini" href="/"> <img src="/public/img/logo.png"></a>
+        </div>
+        <div class="navbar-menu-wrapper d-flex align-items-stretch">
+            <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+                <span class="mdi mdi-menu"></span>
+            </button>
+            <div class="search-field d-none d-xl-block">
+                <form class="d-flex align-items-center h-100" action="/seller/product/list">
+                    <div class="input-group">
+                        <div class="input-group-prepend bg-transparent">
+                            <i class="input-group-text border-0 mdi mdi-magnify"></i>
+                        </div>
+                        <input type="text" name="q" class="form-control bg-transparent border-0" placeholder="Search products">
+                    </div>
+                </form>
+            </div>
+            <ul class="navbar-nav navbar-nav-right">
+                <li class="nav-item nav-profile dropdown">
+                    <a class="nav-link dropdown-toggle" id="profileDropdown" href="#" data-toggle="dropdown"
+                       aria-expanded="false">
+                        <div class="nav-profile-img">
+                            <img src="{{ request.user.image }}"
+                                 alt="image">
+                        </div>
+                        <div class="nav-profile-text">
+                            <p class="mb-1 text-black">{{ request.user.first_name }}</p>
+                        </div>
+                    </a>
+                    <div id="profileDropdownsh" class="dropdown-menu navbar-dropdown dropdown-menu-right p-0 border-0 font-size-sm" aria-labelledby="profileDropdown" data-x-placement="bottom-end">
+                        <div class="p-3 text-center bg-primary">
+                            <img class="img-avatar img-avatar48 img-avatar-thumb" src="{{ request.user.image }}" alt="">
+                        </div>
+                        <div class="p-2">
+                            <a class="dropdown-item py-1 d-flex align-items-center justify-content-between" href="/seller/profile">
+                                <span>Profile</span>
+                                <span class="p-0">
+                                    <i class="mdi mdi-account-outline ml-1"></i>
+                                </span>
+                            </a>
+                            <a class="dropdown-item py-1 d-flex align-items-center justify-content-between" id="logout-here-but" href="#">
+                                <span>Log Out</span>
+                                <i class="mdi mdi-logout ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
+                    data-toggle="offcanvas">
+                <span class="mdi mdi-menu"></span>
+            </button>
+        </div>
+    </nav>
+    <div class="container-fluid page-body-wrapper">
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <ul class="nav">
+                <li class="nav-item nav-category">Main</li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/seller/">
+                        <span class="icon-bg"><i class="mdi mdi-cube menu-icon"></i></span>
+                        <span class="menu-title">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/seller/report/filter">
+                        <span class="icon-bg"><i class="mdi mdi-printer menu-icon"></i></span>
+                        <span class="menu-title">Report</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/seller/coupon">
+                        <span class="icon-bg"><i class="mdi mdi-box-cutter menu-icon"></i></span>
+                        <span class="menu-title">Coupon</span>
+                    </a>
+                </li>
+                <li class="nav-item nav-category">Products</li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/seller/pickup">
+                        <span class="icon-bg"><i class="mdi mdi-city menu-icon"></i></span>
+                        <span class="menu-title">Pickup Area</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/seller/zipcode/area">
+                        <span class="icon-bg"><i class="mdi mdi-city menu-icon"></i></span>
+                        <span class="menu-title">Product Zip Area</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/seller/product/add/0">
+                        <span class="icon-bg"><i class="mdi mdi-medical-bag menu-icon"></i></span>
+                        <span class="menu-title">Add Products</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/seller/product/list">
+                        <span class="icon-bg"><i class="mdi mdi-shopping menu-icon"></i></span>
+                        <span class="menu-title">Product List</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/seller/order">
+                        <span class="icon-bg"><i class="mdi mdi-shopping-music menu-icon"></i></span>
+                        <span class="menu-title">Order</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            {% include template %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/public/js/hoverable-collapse.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
+<script src="https://jeremyfagis.github.io/dropify/dist/js/dropify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.js"></script>
+<script src="/public/js/toast.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.2/croppie.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/smartwizard@5.0.0/dist/js/jquery.smartWizard.min.js"></script>
+
+<script src="/public/js/setting.js"></script>
+<script src="/public/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+{% load filters %}
+<div class="card-body">
+    <div class="d-lg-flex justify-content-between align-items-center pt-2 pb-3 border-bottom">
+        <div class="d-flex mb-4 text-dark w-100 text-center">
+            <h5 class="w-100">Pickup Address</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="card w-100">
+            {% if permission %}
+                <div class="card-body pb-0">
+                    <form class="needs-validation" method="post">
+                        <div class="row gutters">
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="Street">Street</label>
+                                    <input class="form-control" required type="text" placeholder="Street" name="address">
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="ciTy">City</label>
+                                    <input class="form-control" required type="text" placeholder="City" name="city">
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="sTate">State</label>
+                                    <input class="form-control" required type="text" placeholder="State" name="state">
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="zIp">Zip Code</label>
+                                    <input class="form-control" required type="text" placeholder="Zipcode" name="zipcode">
+                                </div>
+                            </div>
+                        </div>
+                        <input class="btn btn-primary" type="submit" value="Save Now"/>
+                    </form>
+                </div>
+            {% endif %}
+            <div class="card-body">
+                <div id="table" class="table-editable">
+                    <table class="table table-bordered table-responsive-md table-striped text-center">
+                        <thead>
+                        <tr>
+                            {% if permission == False %}
+                                <th class="text-center"><b>#</b></th>
+                                <th class="text-center"><b>Shop Name</b></th>
+                            {% endif %}
+                            <th class="text-center"><b>Pickup</b></th>
+                            <th class="text-center"><b>Status</b></th>
+                            <th class="text-center"><b>Remove</b></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for pul in pickup_location %}
+                            <tr>
+                                {% if permission == False %}
+                                    <td class="pt-3-half">
+                                        <img src="{{ pul.shop.image }}" alt="profile image" class="profile-img img-lg rounded-circle">
+                                    </td>
+                                    <td class="pt-3-half">{{ pul.shop.get_full_name }} [{{ pul.shop.number }}]</td>
+                                {% endif %}
+                                <td class="pt-3-half">{{ pul.address }}</td>
+                                <td class="pt-3-half">
+                                    {% if pul.is_active %}
+                                        Active
+                                    {% else %}
+                                        Pending
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="table-remove">
+                                        <a href="?id={{ pul.id }}" class="btn btn-danger btn-rounded btn-sm my-0">Remove</a>
+                                    </span>
+                                    {% if permission == False %}
+                                        {% if pul.is_active == False %}
+                                            <span class="table-remove">
+                                                <a href="?approved={{ pul.id }}" class="btn btn-primary btn-rounded btn-sm my-0">Approve</a>
+                                            </span>
+                                        {% else %}
+                                            <span class="table-remove">
+                                                <a href="?deny={{ pul.id }}" class="btn btn-inverse-danger btn-rounded btn-sm my-0">Deny</a>
+                                            </span>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+</script>

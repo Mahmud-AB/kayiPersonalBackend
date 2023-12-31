@@ -1,0 +1,145 @@
+{% load filters %}
+<div class="card-body">
+    <div class="d-lg-flex justify-content-between align-items-center pt-2 pb-3 border-bottom">
+        <div class="d-flex mb-4 text-dark w-100 text-center">
+            <h5 class="w-100">Available Coupon</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="card w-100">
+            <form class="needs-validation mt-5" method="post">
+                <div class="form-row">
+                    <div class="col-md-6 mb-3">
+                        <label for="validationCustom05">Code</label>
+                        <input type="text" class="form-control" name="code" placeholder="NEW300" required>
+                        <div class="invalid-feedback">
+                            Please provide a valid code.
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="validationCustom05">Expired Date</label>
+                        <input type="text" class="form-control" name="expired" id="expired" onclick="openDateTime()" placeholder="yyyy-dd-mm hh:mm:ss" required>
+                        <div class="invalid-feedback">
+                            Please provide a valid datetime.
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-4 mb-4">
+                        <label for="validationCustom05">Discount amount</label>
+                        <input type="number" class="form-control" name="amount_discount" placeholder="100" required>
+                        <div class="invalid-feedback">
+                            Please provide a valid code.
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <label for="validationCustom05">Min Order amount</label>
+                        <input type="number" class="form-control" name="amount_order" placeholder="100" required>
+                        <div class="invalid-feedback">
+                            Please provide a valid code.
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <label for="validationCustom04">Discount Type</label>
+                        <select class="form-control" required name="coupon_type">
+                            <option value="DOLLAR">$ Dollar</option>
+                            <!--option value="PERCENTAGE">% Percentage</option-->
+                        </select>
+                        <div class="invalid-feedback">
+                            Please provide a valid state.
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="validationCustom05">Comment</label>
+                        <textarea type="text" class="form-control" name="comment" placeholder="Text..."></textarea>
+                        <div class="invalid-feedback">
+                            Please provide a valid zip.
+                        </div>
+                    </div>
+                </div>
+                {% if request.user.is_superuser %}
+                    <div class="form-group">
+                        <div class="form-check form-check-flat form-check-primary">
+                            <label class="form-check-label">
+                                <input type="checkbox" name="any_order" class="form-check-input">Any Order
+                            </label>
+                        </div>
+                    </div>
+                {% endif %}
+                <input type="hidden" name="user_id" value="0">
+                {% if message != None %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        {{ message }}
+                    </div>
+                {% endif %}
+                <input class="btn btn-primary" type="submit" value="Save Now"/>
+            </form>
+
+            <div class="card-body">
+                <div id="table" class="table-editable">
+                    <span class="table-add float-right mb-3 mr-2">
+                        <a href="" class="text-success"><i class="fas fa-plus fa-2x" aria-hidden="true"></i></a>
+                    </span>
+                    <table class="table table-bordered table-responsive-md table-striped text-center">
+                        <thead>
+                        <tr>
+                            <th class="text-center">Code</th>
+                            <th class="text-center">Discount Amount</th>
+                            <th class="text-center">Min Order Amount</th>
+                            <th class="text-center">Expired</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for coupon in coupons %}
+                            <tr>
+                                <td class="pt-3-half">{{ coupon.code }}</td>
+                                {% if coupon.coupon_type == 'DOLLAR' %}
+                                    <td class="pt-3-half">${{ coupon.amount_discount }}</td>
+                                {% elif coupon.coupon_type == 'PERCENTAGE' %}
+                                    <td class="pt-3-half">{{ coupon.amount_discount }}%</td>
+                                {% else %}
+                                    <td class="pt-3-half">{{ coupon.amount_discount }}</td>
+                                {% endif %}
+                                <td class="pt-3-half">${{ coupon.amount_order }}</td>
+                                <td class="pt-3-half">{{ coupon.expired }}</td>
+                                <td>
+                                    <span class="table-remove">
+                                        {% if coupon.user_id == -1 %}
+                                            {% if request.user.is_superuser %}
+                                                <a href="?id={{ coupon.id }}" class="btn btn-danger btn-rounded btn-sm my-0">Remove</a>
+                                            {% else %}
+                                                <a href="#"></a>
+                                            {% endif %}
+                                        {% else %}
+                                            <a href="?id={{ coupon.id }}" class="btn btn-danger btn-rounded btn-sm my-0">Remove</a>
+                                        {% endif %}
+
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://www.cssscript.com/demo/material-date-time-picker-simplepicker/dist/simplepicker.css">
+<script src="https://www.cssscript.com/demo/material-date-time-picker-simplepicker/dist/simplepicker.js"></script>
+<script src="https://momentjs.com/downloads/moment.js"></script>
+<script>
+    const simplepicker = new SimplePicker({
+        zIndex: 50
+    });
+
+    function openDateTime() {
+        simplepicker.open();
+    }
+
+    simplepicker.on('submit', (date, readableDate) => {
+        var formattedDate = moment(date).format('YYYY-MM-DD HH:mm:ss');
+        $("#expired").val(formattedDate)
+    });
+</script>

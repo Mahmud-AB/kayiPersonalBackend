@@ -1,0 +1,74 @@
+{% load filters %}
+<div class="card-body">
+    <div class="d-lg-flex justify-content-between align-items-center pt-2 pb-3 border-bottom">
+        <div class="d-flex mb-4 text-dark w-100 text-center">
+            <h5 class="w-100">Available Zip Code</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="card w-100">
+            <form class="needs-validation mt-5" method="post">
+                <div class="form-row">
+                    <div class="col-md-6 mb-3">
+                        <label for="validationCustom04">State</label>
+                        <select class="form-control" required name="state" id="set-state">
+
+                        </select>
+                        <div class="invalid-feedback">
+                            Please provide a valid state.
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="validationCustom04">City</label>
+                        <select class="form-control" required name="city" id="set-city">
+
+                        </select>
+                        <div class="invalid-feedback">
+                            Please provide a valid state.
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="validationCustom05">Zip</label>
+                        <input type="text" class="form-control" name="zip" placeholder="10001,10002,10003" required>
+                        <div class="invalid-feedback">
+                            Please provide a valid zip.
+                        </div>
+                    </div>
+                </div>
+                <input class="btn btn-primary" type="submit" value="Save Now"/>
+            </form>
+            <div class="card-body">
+                <div id="table" class="table-editable">
+                    <span class="table-add float-right mb-3 mr-2">
+                        <a href="" class="text-success"><i class="fas fa-plus fa-2x" aria-hidden="true"></i></a>
+                    </span>
+                    <table class="table table-bordered table-responsive-md table-striped text-center">
+                        <thead>
+                        <tr>
+                            <th class="text-center">City</th>
+                            <th class="text-center">State</th>
+                            <th class="text-center">ZipCode</th>
+                            <th class="text-center">Remove</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for zip in zips %}
+                            <tr>
+                                <td class="pt-3-half">{{ zip.city }}</td>
+                                <td class="pt-3-half">{{ zip.state }}</td>
+                                <td class="pt-3-half">{{ zip.zipcode }}</td>
+                                <td>
+                                    <span class="table-remove">
+                                        <a href="zipcode?id={{ zip.id }}" class="btn btn-danger btn-rounded btn-sm my-0">Remove</a>
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/public/js/pages/zipcode.js"></script>

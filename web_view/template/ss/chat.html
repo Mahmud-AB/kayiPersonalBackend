@@ -1,0 +1,64 @@
+{% load filters %}
+<div class="row">
+    <div class="col-md-12">
+        <button type="button" class="btn btn-secondary py-3 mb-4 text-center d-md-none aside-toggler"><i class="mdi mdi-menu mr-0 icon-md"></i></button>
+        <div class="card chat-app-wrapper">
+            <div class="row mx-0">
+                <div class="col-lg-4 col-md-4 chat-list-wrapper px-0" id="chatbox-left">
+                    <div class="sidebar-spacer">
+                        <div class="input-group chat-search-input">
+                            <input type="text" class="form-control" placeholder="Search Inbox" aria-label="Username">
+                            <div class="input-group-append">
+                            <span class="input-group-text">
+                              <i class="mdi mdi-magnify"></i>
+                            </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-list-item-wrapper">
+                        {% for s in sm %}
+                            <div class="list-item cursor-pointer" onclick="viewRoom({{ s.room_id }})">
+                                <div class="profile-image">
+                                    <!--div class="dot-indicator sm bg-success"></div-->
+                                    <img class="img-sm rounded-circle" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTmp7Zkhf_H_iJDUGaaRhchdSo0Qt6xUqQJ2HxC9kmAvpvmhxG6&usqp=CAU">
+                                </div>
+                                <p class="user-name  text-dark">{{ s.username }}</p>
+                                <p class="chat-time">{{ 1|nowdayago:s.created }}</p>
+                                {% if s.is_replay %}
+                                    <p class="chat-text text-gray">{{ s.message }}</p>
+                                {% else %}
+                                    <p class="chat-text">{{ s.message }}</p>
+                                {% endif %}
+
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-8 px-0 d-flex flex-column" id="chatbox-right">
+                    <div class="chat-container-wrapper" id="show-caht-history">
+
+                    </div>
+                    <div class="chat-text-field mt-auto">
+                        <div action="#">
+                            <div class="input-group">
+                                <textarea id="send-message-input" type="text" class="form-control" placeholder="Type a message here" style="height:auto;max-height: 300px;min-height: 40px"></textarea>
+                                <div class="input-group-append">
+                                    <button id="send-message-send" type="submit" class="input-group-text"><i class="mdi mdi-send icon-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    {% if sm.0.room_id > 0 %}
+        var currentSelectRoomId ={{ sm.0.room_id }};
+    {% else %}
+        var currentSelectRoomId = 0;
+    {% endif %}
+</script>
+<script src="/public/js/pages/chat.js"></script>

@@ -1,0 +1,122 @@
+{
+  "id": "PAYID-MGZD2IA68H75057GF4257451",
+  "intent": "sale",
+  "state": "approved",
+  "cart": "8G872713BG0292153",
+  "payer": {
+    "payment_method": "paypal",
+    "status": "VERIFIED",
+    "payer_info": {
+      "email": "sb-zi3668898498@personal.example.com",
+      "first_name": "John",
+      "last_name": "Doe",
+      "payer_id": "JWTQSLGC5ZNQ4",
+      "shipping_address": {
+        "recipient_name": "John Doe",
+        "line1": "1 Main St",
+        "city": "San Jose",
+        "state": "CA",
+        "postal_code": "95131",
+        "country_code": "US"
+      },
+      "phone": "4087742540",
+      "country_code": "US"
+    }
+  },
+  "transactions": [
+    {
+      "amount": {
+        "total": "14.19",
+        "currency": "USD",
+        "details": {
+          "subtotal": "1.99",
+          "shipping": "12.20",
+          "insurance": "0.00",
+          "handling_fee": "0.00",
+          "shipping_discount": "0.00",
+          "discount": "0.00"
+        }
+      },
+      "payee": {
+        "merchant_id": "4CXHJ9FH29SNL",
+        "email": "sb-tn3uf8751561@business.example.com"
+      },
+      "description": "The payment transaction description.",
+      "item_list": {
+        "items": [
+          {
+            "name": "Kirkland Signature Whole Milk",
+            "price": "1.99",
+            "currency": "USD",
+            "tax": "0.00",
+            "quantity": 1
+          }
+        ],
+        "shipping_address": {
+          "recipient_name": "John Doe",
+          "line1": "1 Main St",
+          "city": "San Jose",
+          "state": "CA",
+          "postal_code": "95131",
+          "country_code": "US"
+        }
+      },
+      "related_resources": [
+        {
+          "sale": {
+            "id": "6P710429SG6480021",
+            "state": "completed",
+            "amount": {
+              "total": "14.19",
+              "currency": "USD",
+              "details": {
+                "subtotal": "1.99",
+                "shipping": "12.20",
+                "insurance": "0.00",
+                "handling_fee": "0.00",
+                "shipping_discount": "0.00",
+                "discount": "0.00"
+              }
+            },
+            "payment_mode": "INSTANT_TRANSFER",
+            "protection_eligibility": "ELIGIBLE",
+            "protection_eligibility_type": "ITEM_NOT_RECEIVED_ELIGIBLE,UNAUTHORIZED_PAYMENT_ELIGIBLE",
+            "transaction_fee": {
+              "value": "0.99",
+              "currency": "USD"
+            },
+            "parent_payment": "PAYID-MGZD2IA68H75057GF4257451",
+            "create_time": "2021-12-09T17:32:49Z",
+            "update_time": "2021-12-09T17:32:49Z",
+            "links": [
+              {
+                "href": "https://api.sandbox.paypal.com/v1/payments/sale/6P710429SG6480021",
+                "rel": "self",
+                "method": "GET"
+              },
+              {
+                "href": "https://api.sandbox.paypal.com/v1/payments/sale/6P710429SG6480021/refund",
+                "rel": "refund",
+                "method": "POST"
+              },
+              {
+                "href": "https://api.sandbox.paypal.com/v1/payments/payment/PAYID-MGZD2IA68H75057GF4257451",
+                "rel": "parent_payment",
+                "method": "GET"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "create_time": "2021-12-09T17:30:08Z",
+  "update_time": "2021-12-09T17:32:49Z",
+  "links": [
+    {
+      "href": "https://api.sandbox.paypal.com/v1/payments/payment/PAYID-MGZD2IA68H75057GF4257451",
+      "rel": "self",
+      "method": "GET"
+    }
+  ]
+}

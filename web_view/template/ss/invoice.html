@@ -1,0 +1,96 @@
+{% load filters %}
+<div class="card-body pl-lg-5 pr-lg-5">
+    <div id="print-invoice-div">
+        <div class="container-fluid d-flex justify-content-between mt-5">
+            <div class="col-lg-3 pl-0">
+                <h3 class="text-left">Order&nbsp;&nbsp;#{{ order.id }}</h3>
+            </div>
+            <div class="col-lg-3 pr-0">
+                <h4 class="text-right">Invoice&nbsp;&nbsp;#V{{ order.id }}-{{ invoice.0.shop }}</h4>
+            </div>
+        </div>
+        <hr>
+        <div class="container-fluid d-flex justify-content-between">
+            <div class="col-lg-3 pl-0">
+                {% if current_user.is_superuser %}
+                    <p class="mt-5 mb-2"><b>Kayi</b></p>
+                {% else %}
+                    <p class="mt-5 mb-2"><b>{{ current_user.first_name }}</b></p>
+                {% endif %}
+                <p>{{ current_user.get_address_json.address }},<br>{{ current_user.get_address_json.city }} {{ current_user.get_address_json.state }},<br>{{ current_user.get_address_json.zip }}</p>
+            </div>
+            <div class="col-lg-3 pr-0">
+                <p class="mt-5 mb-2 text-right"><b>Invoice to</b></p>
+                <p class="text-right">
+                    {{ order.user.get_full_name }}<br>
+                    {{ address.address }}<br>
+                    {{ address.city }}, {{ address.state }} {{ address.zip }}<br>
+                    {{ order.get_phone_number }}
+                </p>
+            </div>
+        </div>
+        <div class="container-fluid d-flex justify-content-between">
+            <div class="col-lg-3 pl-0">
+                <p class="mb-0 mt-5">Invoice Date : {{ order.created }}</p>
+                <p>Due Date : {{ order.updated }}</p>
+            </div>
+        </div>
+        <div class="container-fluid mt-5 d-flex justify-content-center w-100">
+            <div class="table-responsive w-100">
+                <table class="table">
+                    <thead>
+                    <tr class="bg-dark text-white">
+                        <th>#</th>
+                        <th>Title</th>
+                        <th class="text-right">Quantity</th>
+                        <th class="text-right">Unit cost</th>
+                        <th class="text-right">Discount</th>
+                        <th class="text-right">Total</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for pp in invoice %}
+                        {% if pp.status == "CANCEL" %}
+                            <tr class="text-right" style="text-decoration: line-through;">
+                                <td class="text-left">{{ pp.product.id }}</td>
+                                <td class="text-left">{{ pp.product.name }}</td>
+                                <td>{{ pp.product_quantity }}</td>
+                                <td>${{ pp.product_price }}</td>
+                                <td>{{ pp.product_discount }}%</td>
+                                <td>${{ pp.product_price_final }}</td>
+                            </tr>
+                        {% else %}
+                            <tr class="text-right">
+                                <td class="text-left">{{ pp.product.id }}</td>
+                                <td class="text-left">{{ pp.product.name }}</td>
+                                <td>{{ pp.product_quantity }}</td>
+                                <td>${{ pp.product_price }}</td>
+                                <td>{{ pp.product_discount }}%</td>
+                                <td>${{ pp.product_price_final }}</td>
+                            </tr>
+                        {% endif %}
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="container-fluid mt-5 w-100">
+            <h6 class="text-right">Order Amount: ${{ order.amount }}</h6>
+            <h6 class="text-right">Tax Amount: ${{ order.tax_amount }}</h6>
+            <h6 class="text-right">Delivery Fee : ${{ order.delivery_amount }}</h6>
+            <h6 class="text-right">Delivery Tips : ${{ order.tips }}</h6>
+            <h6 class="text-right">----------------------------------</h6>
+            <h4 class="text-right mb-5">Total : ${{ order.total_amount }}</h4>
+            <hr>
+        </div>
+    </div>
+    <div class="container-fluid w-100">
+        <button class="btn btn-primary float-right mt-4 ml-2 cursor-pointer" onclick="printDiv('print-invoice-div')">
+            <i class="mdi mdi-printer text-white"></i> Print
+        </button>
+    </div>
+</div>
+<script>
+    document.title = 'order-{{ order.id }}-invoice-{{ current_user.id }}'
+</script>

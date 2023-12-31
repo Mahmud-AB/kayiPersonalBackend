@@ -1,0 +1,103 @@
+<div class="card-body">
+    <div class="d-lg-flex justify-content-between align-items-center pt-2 pb-3 border-bottom">
+        <div class="d-flex mb-4 text-dark w-100">
+            <h5 class="w-100">Seller {{ users|length }}</h5>
+        </div>
+        <div class="ml-lg-auto d-flex align-items-stretch justify-content-end">
+            <form>
+                <input type="text" name="email" class="form-control w-150" placeholder="Search by email">
+            </form>
+        </div>
+    </div>
+    {% ifequal users|length 0 %}
+        <div>
+            <center><h3 class="text-gray mt-lg-5">Nothing yet to show</h3></center>
+        </div>
+    {% endifequal %}
+    <div class="row">
+        {% for user in users %}
+            <div class="col-md-12 mb-5">
+                <div class="card rounded shadow-none border"
+                    {% if user.is_active == False %}
+                        style="background: #ff00471a"
+                    {% endif %}>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 d-xl-flex">
+                                <div class="user-avatar mb-auto">
+                                    <img src="{{ user.image }}"
+                                         alt="profile image"
+                                         class="profile-img img-lg rounded-circle">
+                                </div>
+                                <div class="wrapper pl-0 pl-xl-4">
+                                    <div class="wrapper d-flex align-items-center">
+                                        <h4 class="mb-0 font-weight-medium text-dark">
+                                            <svg style="width:17px;height:17px" viewBox="0 0 24 24">
+                                                <path fill="currentColor" d="M6,17C6,15 10,13.9 12,13.9C14,13.9 18,15 18,17V18H6M15,9A3,3 0 0,1 12,12A3,3 0 0,1 9,9A3,3 0 0,1 12,6A3,3 0 0,1 15,9M3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3H5C3.89,3 3,3.9 3,5Z"/>
+                                            </svg>
+                                            <a href="/service/info?email={{ user.email }}" class="text-black">{{ user.first_name }}</a>
+                                            {% if user.is_active %}
+                                                <span class="icon-bg"><i class="mdi mdi-shield-check text-success"></i></span>
+                                            {% endif %}
+                                        </h4>
+                                    </div>
+                                    <div class="wrapper d-flex align-items-center font-weight-medium text-muted">
+                                        <p class="text-muted">
+                                            <svg style="width:17px;height:17px" viewBox="0 0 24 24">
+                                                <path fill="currentColor" d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"/>
+                                            </svg>
+                                            {% if user.get_address %}
+                                                {{ user.get_address }}
+                                            {% endif %}
+
+                                        </p>
+                                    </div>
+                                    <div class="wrapper d-flex">
+                                        <h4 class="mb-0 font-weight-medium text-dark">
+                                            <svg style="width:17px;height:17px" viewBox="0 0 24 24">
+                                                <path fill="currentColor" d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z"/>
+                                            </svg>
+                                            <a href="/service/info?email={{ user.email }}" class="text-black">{{ user.email }}</a>
+                                        </h4>
+                                    </div>
+                                    <div class="wrapper d-flex align-items-center font-weight-medium text-muted">
+                                        <p class="text-muted"><i class="mdi mdi-phone-classic menu-icon"></i> {{ user.phone }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="d-flex align-items-center w-100">
+                                    <p class="mb-0 mr-3 font-weight-semibold text-dark">About</p>
+                                    <div class="progress progress-md w-100">
+                                        <div class="progress-bar bg-success w-100" role="progressbar" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <p class="text-dark">
+                                    <h5>Tax Amount: ${{ user.seller_tax }}</h5>
+                                    <h5>Commission: {{ user.commission }}%</h5>
+                                </p>
+                                <p class="text-dark">Shop number: {{ user.number }}</p>
+                                <p class="text-muted">{{ user.about }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="wrapper d-flex justify-content-end">
+                                    {% if user.is_active %}
+                                        <button type="button" class="btn btn-sm btn-inverse-danger mr-2 deactivate-seller-but" val="{{ user.id }}">Deactivate</button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-sm btn-info mr-2 active-seller-but" val="{{ user.id }}">Active</button>
+                                    {% endif %}
+                                    <button type="button" class="btn btn-sm btn-facebook product-seller-but" val="{{ user.id }}">Products</button>
+                                </div>
+
+                                <div class="wrapper d-flex justify-content-end mt-1">
+                                    <a href="./zipcode/area/{{ user.id }}" class="btn btn-sm btn-google product-seller-but">Zip Areas</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+<script src="/public/js/pages/active.js"></script>

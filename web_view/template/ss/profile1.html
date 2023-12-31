@@ -1,0 +1,138 @@
+<div class="card-body">
+    <div class="container">
+        {% for foo in message %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ foo }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+        <div class="row my-2">
+            <div class="col-lg-8 order-lg-2">
+                <div class="tab-content py-4">
+                    <form role="form" method="post">
+                        {% if uu.is_superuser %}
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label">Name</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="text" value="{{ uu.first_name }}" name="input--fl">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="display: none">
+                                <label class="col-lg-3 col-form-label form-control-label">Last name</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="hidden" value="{{ uu.last_name }}" name="input--ll">
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label">Shop Name</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="text" value="{{ uu.first_name }}" name="input--fl">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label">Shop Number</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="text" value="{{ uu.number }}" readonly>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label form-control-label">Tax Amount</label>
+                                <div class="col-lg-9">
+                                    {% if uu.seller_tax > 0 %}
+                                        <input class="form-control" type="text" value="{{ uu.seller_tax }}" readonly>
+                                    {% else %}
+                                        <input class="form-control" type="text" value="{{ uu.seller_tax }}" name="input--tax">
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label form-control-label">Email</label>
+                            <div class="col-lg-9">
+                                <input class="form-control" type="email" value="{{ uu.email }}" name="input--email">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label form-control-label">Phone</label>
+                            <div class="col-lg-9">
+                                <input class="form-control" type="text" value="{{ uu.phone }}" name="input--phone">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label form-control-label">Address</label>
+                            <div class="col-lg-9">
+                                <input class="form-control" type="text" value="{{ uu.get_address_json.address }}" name="input--add">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label form-control-label">State</label>
+                            <div class="col-lg-9">
+                                <input class="form-control" type="text" value="{{ uu.get_address_json.state }}" name="input--st">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label form-control-label">City</label>
+                            <div class="col-lg-9">
+                                <input class="form-control" type="text" value="{{ uu.get_address_json.city }}" name="input--ct">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label form-control-label">Zipcode</label>
+                            <div class="col-lg-9">
+                                <input class="form-control" type="text" value="{{ uu.get_address_json.zip }}" name="input--zip">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label form-control-label">Password</label>
+                            <div class="col-lg-9">
+                                <input class="form-control" type="password" value="" name="input--p1">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label form-control-label">Confirm password</label>
+                            <div class="col-lg-9">
+                                <input class="form-control" type="password" value="" name="input--p2">
+                            </div>
+                        </div>
+                        <input type="hidden" name="input--image" id="input-image" class="custom-file-input" value="">
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label form-control-label"></label>
+                            <div class="col-lg-9">
+                                <input type="submit" class="btn btn-primary" value="Save Changes">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-4 order-lg-1 text-center">
+                <label class="custom-file">
+                    <input type="file" id="file" class="custom-file-input" onchange="browseImg(this)">
+                    <img src="{{ uu.image }}" id="file-preview" class="mx-auto img-fluid img-circle d-block custom-file-control" alt="avatar" style="height: 100px">
+                    <h6 class="mt-2">Upload a different photo</h6>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function browseImg(obj) {
+        const reader = new FileReader();
+        reader.onloadend = function () {
+            $('#file-preview').attr("src", reader.result)
+            $('#input-image').val(reader.result)
+        };
+        reader.readAsDataURL(obj.files[0]);
+    }
+</script>

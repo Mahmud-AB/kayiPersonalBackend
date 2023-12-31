@@ -1,0 +1,317 @@
+<style>
+    .im-column {
+        float: left;
+        width: 25%;
+        padding: 0 10px;
+    }
+
+    .im-row {
+        margin: 0 -5px;
+    }
+
+    .im-row:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    .im-card {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        padding: 16px;
+        text-align: center;
+        background-color: #f1f1f1;
+    }
+
+    @media screen and (max-width: 600px) {
+        .im-column {
+            width: 100%;
+            display: block;
+            margin-bottom: 20px;
+        }
+    }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<div class="modal" id="uploadimageModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-10 text-center">
+                        <div id="image_crop_view" style="width:100%; margin-top:30px"></div>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <button type="button" class="btn btn-success" style="width: 100px" id="crop_save">Crop & Save</button>
+                        <br><br>
+                        <button type="button" class="btn btn-danger" style="width: 100px" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card-body">
+    <div class="d-lg-flex justify-content-between align-items-center pt-2 pb-3 border-bottom">
+        <div class="d-flex mb-4 text-dark w-100 text-center">
+            <h5 class="w-100">Add Product</h5>
+        </div>
+    </div>
+
+    <div id="smartwizard">
+        <br>
+        <br>
+        <div id="step-1" class="tab-pane" role="tabpanel" aria-labelledby="step-1">
+            {% ifequal product None %}
+                <input type="hidden" id="product_id" value="0">
+            {% else %}
+                <input type="hidden" id="product_id" value="{{ product.id }}">
+            {% endifequal %}
+
+            <div class="form-group">
+                <div class="form-group">
+                    <label>Select Category</label>
+                    <select data-placeholder="Choose Category" class="js-example-basic-single" id="p_category1" style="width:100%">
+                        <option value="">Chose category</option>
+                        {% for c in category %}
+                            {% ifequal c.child|length 0 %}
+                                <option value="{{ c.id }}">{{ c.name }}</option>
+                            {% else %}
+                                <optgroup label="{{ c.name }}">
+                                    {% for ch in c.child %}
+                                        <option value="{{ ch.id }}">{{ ch.name }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            {% endifequal %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Product Name</label>
+                <input type="text" id="p_name" class="form-control form-control-lg" placeholder="Name" value="{{ product.name }}">
+            </div>
+            <div class="form-group">
+                <label>Product price old</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">$</span>
+                    </div>
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">00.00</span>
+                    </div>
+                    <input id="p_price" type="text" min="0" max="1000000" class="form-control" aria-label="Amount (to the nearest dollar)" value="{{ product.price }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Product price new</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">$</span>
+                    </div>
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">00.00</span>
+                    </div>
+                    <input type="text" id="p_price_new" min="0" max="1000000" class="form-control" aria-label="Amount (to the nearest dollar)" value="{{ product.price_new }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Product Stock</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"></span>
+                    </div>
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">1-100000</span>
+                    </div>
+                    <input type="number" id="p_stock" min="0" max="100000" class="form-control" value="{{ product.available }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Product Size/Weight</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"></span>
+                    </div>
+                    <div class="input-group-prepend">
+                        <select data-placeholder="Choose weight/size type" class="js-example-basic-single" id="p_size_type">
+                            <option value="">Choose weight/size type</option>
+                            {% for c in weight_values %}
+                                {% ifequal c.child|length 0 %}
+                                    <option value="{{ c.name }}">{{ c.name }}</option>
+                                {% else %}
+                                    <optgroup label="{{ c.name }}">
+                                        {% for ch in c.child %}
+                                            <option value="{{ ch.name }}">{{ ch.name }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                {% endifequal %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <input type="number" id="p_size" min="0" max="1000" class="form-control">
+                </div>
+            </div>
+        </div>
+        {% ifnotequal product None %}
+            <br>
+            <div id="lightgallery" class="row lightGallery">
+                <div class="im-row">
+                    <div class="im-column" id="im-column-001">
+                        {% ifequal product.image1 None %}
+                            <label class="cursor-pointer">
+                                <img for="browseImg1" id="browseImgShow1" src="/public/img/browse-file.gif"/>
+                                <input type="file" visbility="hidden" style="display: none;" id="browseImg1">
+                            </label>
+                        {% else %}
+                            <div class="delete-product-image" onclick="deleteProductImg({{ product.id }},1)">
+                                <i class="mdi mdi-delete text-large text-white"></i>
+                            </div>
+                            <div class="im-card">
+                                <label class="cursor-pointer">
+                                    <img for="browseImg1" id="browseImgShow1" src="{{ product.image1 }}" width="100%"/>
+                                    <input type="file" visbility="hidden" style="display: none;" id="browseImg1">
+                                </label>
+                            </div>
+                        {% endifequal %}
+                    </div>
+                    <div class="im-column" id="im-column-002">
+                        {% ifequal product.image2 None %}
+                            <label class="cursor-pointer">
+                                <img for="browseImg2" id="browseImgShow2" src="/public/img/browse-file.gif"/>
+                                <input type="file" visbility="hidden" style="display: none;" id="browseImg2">
+                            </label>
+                        {% else %}
+                            <div class="delete-product-image" onclick="deleteProductImg({{ product.id }},2)">
+                                <i class="mdi mdi-delete text-large text-white"></i>
+                            </div>
+                            <div class="im-card">
+                                <label class="cursor-pointer">
+                                    <img for="browseImg2" id="browseImgShow2" src="{{ product.image2 }}" width="100%"/>
+                                    <input type="file" visbility="hidden" style="display: none;" id="browseImg2">
+                                </label>
+                            </div>
+                        {% endifequal %}
+                    </div>
+                    <div class="im-column" id="im-column-003">
+                        {% ifequal product.image3 None %}
+                            <label class="cursor-pointer">
+                                <img for="browseImg3" id="browseImgShow3" src="/public/img/browse-file.gif"/>
+                                <input type="file" visbility="hidden" style="display: none;" id="browseImg3">
+                            </label>
+                        {% else %}
+                            <div class="delete-product-image" onclick="deleteProductImg({{ product.id }},3)">
+                                <i class="mdi mdi-delete text-large text-white"></i>
+                            </div>
+                            <div class="im-card">
+                                <label class="cursor-pointer">
+                                    <img for="browseImg3" id="browseImgShow3" src="{{ product.image3 }}" width="100%"/>
+                                    <input type="file" visbility="hidden" style="display: none;" id="browseImg3">
+                                </label>
+                            </div>
+                        {% endifequal %}
+                    </div>
+                    <div class="im-column" id="im-column-004">
+                        {% ifequal product.image4 None %}
+                            <label class="cursor-pointer">
+                                <img for="browseImg4" id="browseImgShow4" src="/public/img/browse-file.gif"/>
+                                <input type="file" visbility="hidden" style="display: none;" id="browseImg4">
+                            </label>
+                        {% else %}
+                            <div class="delete-product-image" onclick="deleteProductImg({{ product.id }},4)">
+                                <i class="mdi mdi-delete text-large text-white"></i>
+                            </div>
+                            <div class="im-card">
+                                <label class="cursor-pointer">
+                                    <img for="browseImg4" id="browseImgShow4" src="{{ product.image4 }}" width="100%"/>
+                                    <input type="file" visbility="hidden" style="display: none;" id="browseImg4">
+                                </label>
+                            </div>
+                        {% endifequal %}
+                    </div>
+                </div>
+            </div>
+        {% endifnotequal %}
+
+        <div class="form-group">
+            <div class="form-check form-check-flat form-check-primary">
+                <label class="form-check-label">
+                    {% ifequal product None %}
+                        <input type="checkbox" id="p_display" class="form-check-input">Out of Stock
+                    {% else %}
+                        {% if product.display %}
+                            <input type="checkbox" id="p_display" class="form-check-input">Out of Stock
+                            <i class="input-helper"></i>
+                        {% else %}
+                            <input type="checkbox" id="p_display" class="form-check-input" checked>Out of Stock
+                            <i class="input-helper"></i>
+                        {% endif %}
+                    {% endifequal %}
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="p_description">Description</label>
+            <textarea class="form-control" id="p_description" rows="4"></textarea>
+        </div>
+        <br>
+        {% ifnotequal product None %}
+            <div class="container-fluid w-100">
+                <input type="submit" class="btn btn-primary float-right mt-4 ml-2" id="save-product-now" value="Save">
+                <input type="submit" class="btn btn-danger float-right mt-4 ml-4" id="del-product-now" value="Delete Product">
+            </div>
+            <div class="container-fluid w-100">
+                <a href="./0" class="btn btn-outline-danger float-right mt-4 ml-2">Cancel</a>
+            </div>
+        {% else %}
+            <div class="container-fluid w-100">
+                <input type="submit" class="btn btn-primary float-right mt-4 ml-2" id="save-product-now" value="Save">
+            </div>
+            <div class="container-fluid w-100">
+                <a href="./0" class="btn btn-outline-danger float-right mt-4 ml-2">Cancel</a>
+            </div>
+        {% endifnotequal %}
+
+    </div>
+</div>
+<pre id="temp_value_1" class="d-none">{{ product.descriptions }}</pre>
+<script src="/public/js/pages/add-product.js"></script>
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+<script>
+    $(document).ready(function () {
+        productWeight();
+
+        $('.js-example-basic-single').select2();
+        $("#p_category1").val("{{product.category_id}}").trigger('change');
+
+        $('#del-product-now').click(function () {
+            deleteProduct();
+        });
+        $('#save-product-now').click(function () {
+            saveProduct();
+        });
+    });
+
+    function productWeight() {
+        {% if product.weight %}
+            try {
+                let product_weight = {{ product.weight|safe }};
+                $("#p_size_type").val(product_weight.type).trigger('change');
+                $("#p_size").val(product_weight.value);
+            } catch (e) {
+                console.log(e)
+            }
+        {% endif %}
+    }
+
+    function deleteProduct() {
+        swal({
+            title: 'Alert!',
+            text: "Are you want to delete this product",
+            type: 'info',
+            confirmButtonText: 'Delete'
+        }).then((okayClick) => {
+            if (okayClick === true || okayClick.value == true) {
+                httpRequest(window.location.href, 'DELETE')
+            }
+        });
+    }
+</script>
