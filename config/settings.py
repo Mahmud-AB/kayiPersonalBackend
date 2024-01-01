@@ -3,6 +3,7 @@ import os
 import environ
 import paypalrestsdk
 import sys
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -135,8 +136,8 @@ USE_TZ = True
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'thekayiusa@gmail.com'
-EMAIL_HOST_PASSWORD = 'bbqfrkwsdvnrholz'
+EMAIL_HOST_USER = 'nirbanmitra007@gmail.com'
+EMAIL_HOST_PASSWORD = 'lsyz hlle sggs cghm'
 
 EMAIL_HOST_USER_SUPPORT = 'info@kayi.us'
 EMAIL_HOST_PASSWORD_SUPPORT = 'Falcon098@'
