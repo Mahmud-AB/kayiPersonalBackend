@@ -1,6 +1,5 @@
 import os
 
-import environ
 import paypalrestsdk
 import sys
 
@@ -9,13 +8,17 @@ load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-env = environ.Env()
-environ.Env.read_env()
+# Specify the path to your .env file
 env_file = os.path.join(BASE_DIR, 'config', ".env." + "development")
-# print("Env: " + env('ENV_TYPE'))
-environ.Env.read_env(env_file=env_file, overwrite=True)
 
-SECRET_KEY = env('SECRET_KEY')
+# Read environment variables from the specified file (optional, if needed)
+load_dotenv(env_file, override=True)
+
+# Access environment variables using os.getenv
+env_type = os.getenv('ENV_TYPE')
+print(f"Env: {env_type}")
+
+SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
@@ -92,11 +95,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': os.environ['DB_ENGINE'] if 'DB_ENGINE' in os.environ else 'django.db.backends.sqlite3',
-        'NAME': os.environ['DB_NAME'] if 'DB_NAME' in os.environ else BASE_DIR / 'db.sqlite3',
+        'NAME': os.environ['DB_NAME'] if 'DB_NAME' in os.environ else os.path.join(BASE_DIR, 'db.sqlite3'),
         'USER': os.environ['DB_USER'] if 'DB_NAME' in os.environ else '',
         'PASSWORD': os.environ['DB_PASSWORD'] if 'DB_PASSWORD' in os.environ else '',
         'HOST': os.environ['DB_HOST'] if 'DB_HOST' in os.environ else '',  
-        # 'HOST': '208-109-36-15',   # Or an IP Address that your DB is hosted on
+        # 'HOST': '208-109-36-15',   # Or an IP Address that your DB is hosted onhjh
         'PORT': os.environ['DB_PORT'] if 'DB_PORT' in os.environ else '',
     }
 }
@@ -144,9 +147,9 @@ EMAIL_HOST_PASSWORD_SUPPORT = 'Falcon098@'
 
 EMAIL_USE_TLS = True
 
-PAYPAL_MODE = env('PAYPAL_MODE')
-PAYPAL_CLIENT_ID = env('PAYPAL_CLIENT_ID')
-PAYPAL_CLIENT_SECRET = env('PAYPAL_CLIENT_SECRET')
+PAYPAL_MODE = os.environ['PAYPAL_MODE']
+PAYPAL_CLIENT_ID = os.environ['PAYPAL_CLIENT_ID']
+PAYPAL_CLIENT_SECRET = os.environ['PAYPAL_CLIENT_SECRET']
 
 AWS_STORAGE_KEY_ID = "AKIASGCZXQOSZURABOLA"
 AWS_STORAGE_KEY_TOKEN = "906xrZAHfuBiSkOi449IK3h8x56LYnJ7AeNcj7lS"
